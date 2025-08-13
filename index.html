@@ -12,41 +12,68 @@ body {
   padding: 0;
   background: #000;
   overflow: hidden;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* --- Start Screen --- */
+#startScreen {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #ff99cc, #ffccff);
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  text-align: center;
+  color: #fff;
+  z-index: 1000;
+}
+#startScreen h1 {
+  font-family: 'Pacifico', cursive;
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  text-shadow: 0 0 5px #fff, 0 0 15px #ff4081;
+}
+#startBtn {
+  background: #ff4081;
   color: white;
-  font-family: 'Poppins', sans-serif;
-  transition: background 1.5s ease;
+  padding: 15px 30px;
+  font-size: 1.2em;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+#startBtn:hover {
+  background: #e73370;
 }
 
 #message {
   font-size: 2em;
+  color: white;
   text-align: center;
   opacity: 0;
   transform: scale(0.9);
   transition: opacity 0.8s ease, transform 0.8s ease;
   padding: 20px;
   max-width: 90%;
+  margin: auto;
   line-height: 1.4em;
 }
-
 .visible {
   opacity: 1;
   transform: scale(1);
 }
-
 .glow {
   text-shadow: 0 0 10px #fff, 0 0 25px #ff4081, 0 0 50px #ff4081;
 }
 
+/* Balloons */
 .balloon {
   position: absolute;
   bottom: -120px;
   width: 60px;
   height: 80px;
-  background: red;
   border-radius: 60% 60% 60% 60%;
   animation: float 6s ease-in infinite;
   box-shadow: inset -2px -4px rgba(0,0,0,0.3);
@@ -60,37 +87,44 @@ body {
   height: 20px;
   background: #ccc;
 }
-
 @keyframes float {
   0% { transform: translateY(0) rotate(0); opacity: 1; }
   100% { transform: translateY(-120vh) rotate(15deg); opacity: 0; }
 }
 
+/* Cake */
 #cake {
   width: 220px;
   display: none;
   animation: fadeIn 1.5s ease forwards;
 }
-
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.8); }
   to   { opacity: 1; transform: scale(1); }
 }
 
+/* Confetti canvas */
 canvas {
   position: fixed;
-  top:0;
-  left:0;
+  top: 0;
+  left: 0;
   pointer-events: none;
 }
 </style>
 </head>
 <body>
 
-<div id="message"></div>
-<img id="cake" src="cake.png" alt="Cake"> <!-- replace with your exact cake image -->
-<audio id="music" src="happy-birthday.mp3"></audio>
+<!-- Start Screen -->
+<div id="startScreen">
+  <h1>Happy Birthday Madam Ji 🎉</h1>
+  <p>Click below to start your special surprise!</p>
+  <button id="startBtn">Start 🎂</button>
+</div>
 
+<!-- Main Content -->
+<div id="message"></div>
+<img id="cake" src="cake.png" alt="Cake">
+<audio id="music" src="happy-birthday.mp3"></audio>
 <canvas id="confetti"></canvas>
 
 <script>
@@ -105,12 +139,16 @@ const steps = [
   { text: "🎈 Time to Decorate!", action: showBalloons, delay: 3000 },
   { text: "🎂 Let’s Cut the Cake Madam Ji", action: showCake, delay: 3000 },
   { text: "💌 I Have a Message for You Madam Ji", delay: 3000 },
-  // Final heartfelt message
   { text: "Dear Madam Ji,\n\nFrom the very first day we met, you've brought smiles, laughter, and warmth into my life. You are truly one of a kind, and today I just want to remind you how special you are to me.\n\nMay your birthday be filled with joy, love, and all the things you adore.\n\nI wish you the happiest birthday! 💖", style:"glow", action: showConfetti, delay: 7000 }
 ];
 
 let stepIndex = 0;
 const msg = document.getElementById("message");
+
+document.getElementById("startBtn").addEventListener("click", () => {
+  document.getElementById("startScreen").style.display = "none";
+  nextStep();
+});
 
 function nextStep() {
   if (stepIndex >= steps.length) return;
@@ -128,15 +166,10 @@ function nextStep() {
 function lightsOn() {
   document.body.style.background = "#111";
 }
-
 function playMusic() {
   const music = document.getElementById("music");
-  music.play().catch(() => {
-    // If autoplay is blocked, just continue without sound
-    console.warn("Autoplay blocked — continuing without music");
-  });
+  music.play().catch(() => console.warn("Autoplay blocked — continuing without music"));
 }
-
 function showBalloons() {
   for (let i = 0; i < 20; i++) {
     const b = document.createElement("div");
@@ -148,15 +181,12 @@ function showBalloons() {
     setTimeout(()=>b.remove(), 6000);
   }
 }
-
 function showCake() {
   document.getElementById("cake").style.display = "block";
 }
-
 function showConfetti() {
   startConfetti();
 }
-
 function startConfetti(){
   const canvas = document.getElementById("confetti");
   const ctx = canvas.getContext("2d");
@@ -189,7 +219,6 @@ function startConfetti(){
     update();
     requestAnimationFrame(draw);
   }
-
   function update(){
     particles.forEach(p=>{
       p.y += 2;
@@ -201,8 +230,6 @@ function startConfetti(){
   }
   draw();
 }
-
-nextStep();
 </script>
 </body>
 </html>
