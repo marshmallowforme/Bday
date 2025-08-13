@@ -130,7 +130,11 @@ function lightsOn() {
 }
 
 function playMusic() {
-  document.getElementById("music").play().catch(()=>{});
+  const music = document.getElementById("music");
+  music.play().catch(() => {
+    // If autoplay is blocked, just continue without sound
+    console.warn("Autoplay blocked — continuing without music");
+  });
 }
 
 function showBalloons() {
