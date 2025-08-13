@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Madam Ji</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #000;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  transition: background 1.5s ease;
+}
+
+#message {
+  font-size: 2em;
+  text-align: center;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+  padding: 20px;
+  max-width: 90%;
+  line-height: 1.4em;
+}
+
+.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.glow {
+  text-shadow: 0 0 10px #fff, 0 0 25px #ff4081, 0 0 50px #ff4081;
+}
+
+.balloon {
+  position: absolute;
+  bottom: -120px;
+  width: 60px;
+  height: 80px;
+  background: red;
+  border-radius: 60% 60% 60% 60%;
+  animation: float 6s ease-in infinite;
+  box-shadow: inset -2px -4px rgba(0,0,0,0.3);
+}
+.balloon::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  width: 2px;
+  height: 20px;
+  background: #ccc;
+}
+
+@keyframes float {
+  0% { transform: translateY(0) rotate(0); opacity: 1; }
+  100% { transform: translateY(-120vh) rotate(15deg); opacity: 0; }
+}
+
+#cake {
+  width: 220px;
+  display: none;
+  animation: fadeIn 1.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+canvas {
+  position: fixed;
+  top:0;
+  left:0;
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<div id="message"></div>
+<img id="cake" src="cake.png" alt="Cake"> <!-- replace with your exact cake image -->
+<audio id="music" src="happy-birthday.mp3"></audio>
+
+<canvas id="confetti"></canvas>
+
+<script>
+const steps = [
+  { text: "Hello Madam Jiii", delay: 2000 },
+  { text: "It’s Your Special Day 🎉", delay: 2500 },
+  { text: "To make something special…", delay: 2500 },
+  { text: "…because you are special to me ❤️", delay: 2500 },
+  { text: "Do you wanna see what I made??", delay: 2500 },
+  { text: "💡 Lights On!", action: lightsOn, delay: 2000 },
+  { text: "🎵 Play Music", action: playMusic, delay: 2000 },
+  { text: "🎈 Time to Decorate!", action: showBalloons, delay: 3000 },
+  { text: "🎂 Let’s Cut the Cake Madam Ji", action: showCake, delay: 3000 },
+  { text: "💌 I Have a Message for You Madam Ji", delay: 3000 },
+  // Final heartfelt message
+  { text: "Dear Madam Ji,\n\nFrom the very first day we met, you've brought smiles, laughter, and warmth into my life. You are truly one of a kind, and today I just want to remind you how special you are to me.\n\nMay your birthday be filled with joy, love, and all the things you adore.\n\nI wish you the happiest birthday! 💖", style:"glow", action: showConfetti, delay: 7000 }
+];
+
+let stepIndex = 0;
+const msg = document.getElementById("message");
+
+function nextStep() {
+  if (stepIndex >= steps.length) return;
+  const step = steps[stepIndex];
+  msg.className = "";
+  setTimeout(() => {
+    msg.textContent = step.text;
+    msg.className = "visible" + (step.style ? " " + step.style : "");
+    if (step.action) step.action();
+    stepIndex++;
+    setTimeout(nextStep, step.delay);
+  }, 500);
+}
+
+function lightsOn() {
+  document.body.style.background = "#111";
+}
+
+function playMusic() {
+  document.getElementById("music").play().catch(()=>{});
+}
+
+function showBalloons() {
+  for (let i = 0; i < 20; i++) {
+    const b = document.createElement("div");
+    b.className = "balloon";
+    b.style.left = Math.random() * 100 + "vw";
+    b.style.background = `hsl(${Math.random()*360},80%,60%)`;
+    b.style.animationDelay = Math.random()*3 + "s";
+    document.body.appendChild(b);
+    setTimeout(()=>b.remove(), 6000);
+  }
+}
+
+function showCake() {
+  document.getElementById("cake").style.display = "block";
+}
+
+function showConfetti() {
+  startConfetti();
+}
+
+function startConfetti(){
+  const canvas = document.getElementById("confetti");
+  const ctx = canvas.getContext("2d");
+  let W,H;
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const particles = [];
+  for(let i=0;i<250;i++){
+    particles.push({
+      x: Math.random()*W,
+      y: Math.random()*H - H,
+      r: Math.random()*4+1,
+      color: `hsl(${Math.random()*360},100%,50%)`
+    });
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    particles.forEach(p=>{
+      ctx.beginPath();
+      ctx.fillStyle = p.color;
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fill();
+    });
+    update();
+    requestAnimationFrame(draw);
+  }
+
+  function update(){
+    particles.forEach(p=>{
+      p.y += 2;
+      if(p.y > H){
+        p.y = -10;
+        p.x = Math.random()*W;
+      }
+    });
+  }
+  draw();
+}
+
+nextStep();
+</script>
+</body>
+</html>
